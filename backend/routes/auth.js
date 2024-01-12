@@ -12,7 +12,7 @@ const JWT_SECRET = "aStringUsedToSignTheToken"
 router.post('/createuser', [
     body('name', 'Enter a valid name').isLength({ min: 3 }),
     body('email', 'Invalid email').isEmail(),
-    body('password').isLength({ min: 8 })
+    body('password').isLength({ min: 5 })
 ], async (req, res) => {
     let success = false
     //If there are errors, return bad request and the errors.

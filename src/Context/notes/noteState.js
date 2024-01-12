@@ -1,9 +1,9 @@
-import NoteContext from "./noteContext";
+import noteContext from "./noteContext";
 import { useState } from "react";
 
 const NoteState = (props) => {
     const host = "http://localhost:5000"
-    const notesInitial = []
+    let notesInitial = []
     const [notes, setNotes] = useState(notesInitial)
 
     // Get all Notes
@@ -17,6 +17,7 @@ const NoteState = (props) => {
             }
         });
         const json = await response.json()
+        console.log(json);
         setNotes(json)
     }
 
@@ -82,9 +83,9 @@ const NoteState = (props) => {
     }
 
     return (
-        <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes }}>
+        <noteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes }}>
             {props.children}
-        </NoteContext.Provider>
+        </noteContext.Provider>
     )
 
 }
