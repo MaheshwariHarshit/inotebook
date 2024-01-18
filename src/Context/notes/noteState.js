@@ -1,41 +1,46 @@
 import noteContext from "./noteContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NoteState = (props) => {
-    const host = "http://localhost:5000"
-    let notesInitial = []
-    const [notes, setNotes] = useState(notesInitial)
+    const host = 'http://localhost:5000'
+    const [notes, setNotes] = useState([])
 
     // Get all Notes
     const getNotes = async () => {
         // API Call 
-        const response = await fetch(`${host}/api/notes/fetchallnotes`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                "auth-token": localStorage.getItem('token')
-            }
-        });
-        const json = await response.json()
-        console.log(json);
-        setNotes(json)
+        try {
+            const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('token')
+                }
+            });
+            const json = await response.json()
+            setNotes(json.notes)
+        } catch (error) {
+            console.error('Error fetching or parsing data:', error);
+        }
     }
 
+    useEffect(() => {
+    }, [notes]);
+    
     // Add a Note
     const addNote = async (title, description, tag) => {
-        // TODO: API Call
         // API Call 
         const response = await fetch(`${host}/api/notes/addnote`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                "auth-token": localStorage.getItem('token')
+                'auth-token': localStorage.getItem('token')
             },
             body: JSON.stringify({ title, description, tag })
         });
 
-        const note = await response.json();
-        setNotes(notes.concat(note))
+        let note = []
+        note = await response.json();
+        setNotes(Object.assign(notes, note))
     }
 
     // Delete a Note
@@ -45,11 +50,11 @@ const NoteState = (props) => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                "auth-token": localStorage.getItem('token')
+                'auth-token': localStorage.getItem('token')
             }
         });
-        const json = response.json();
-        console.log(json);
+        // eslint-disable-next-line
+        const json = await response.json();
         const newNotes = notes.filter((note) => { return note._id !== id })
         setNotes(newNotes)
     }
@@ -65,8 +70,8 @@ const NoteState = (props) => {
             },
             body: JSON.stringify({ title, description, tag })
         });
+        // eslint-disable-next-line
         const json = await response.json();
-        console.log(json)
 
         let newNotes = JSON.parse(JSON.stringify(notes))
         // Logic to edit in client

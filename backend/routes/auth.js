@@ -20,13 +20,12 @@ router.post('/createuser', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-
     try {
         //Check if the user with entered email already exists.
         let user = await User.findOne({ email: req.body.email })
 
         if (user) {
-            return res.status(400).json({success, error: "The entered email is already registered." })
+            return res.status(400).json({ success, error: "The entered email is already registered." })
         }
 
         const salt = await bcrypt.genSalt(10)
@@ -43,12 +42,12 @@ router.post('/createuser', [
                 id: user.id
             }
         }
-        
-        const authToken = jwt.sign(data,JWT_SECRET)
-        success = true
-        res.json({success, authToken});
 
-    } catch(error) {
+        const authToken = jwt.sign(data, JWT_SECRET)
+        success = true
+        res.json({ success, authToken });
+
+    } catch (error) {
         res.status(500).send("Interval Server Error")
         console.log(error.message);
     }
@@ -65,16 +64,16 @@ router.post('/login', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const {email, password} = req.body
+    const { email, password } = req.body
     try {
-        let user = await User.findOne({email});
-        if(!user) {
-            return res.status(400).json({error: "Error: Credentails cannot be verified."})
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: "Error: Credentails cannot be verified." })
         }
-        
+
         const passwordCompare = await bcrypt.compare(password, user.password);
-        if(!passwordCompare) {
-            return res.status(400).json({success, error: "Error: Credentails cannot be verified."})
+        if (!passwordCompare) {
+            return res.status(400).json({ success, error: "Error: Credentails cannot be verified." })
         }
 
         const data = {
@@ -82,9 +81,9 @@ router.post('/login', [
                 id: user.id
             }
         }
-        const authToken = jwt.sign(data,JWT_SECRET)
+        const authToken = jwt.sign(data, JWT_SECRET)
         success = true
-        res.json({success, authToken});
+        res.json({ success, authToken });
 
     } catch (error) {
         res.status(500).send("Interval Server Error")
@@ -94,14 +93,14 @@ router.post('/login', [
 
 // ROUTE 3: Get LoggedIn user details using: POST "/api/auth/getuser". Login required.
 router.post('/getuser', fetchuser, async (req, res) => {
-try {
-    const userId = req.user.id
-    const user = await User.findById(userId).select("-password")
-    res.send(user)
-} catch (error) {
-    res.status(500).send("Interval Server Error")
+    try {
+        const userId = req.user.id
+        const user = await User.findById(userId).select("-password")
+        res.send(user)
+    } catch (error) {
+        res.status(500).send("Interval Server Error")
         console.log(error.message);
-}
+    }
 })
 
 module.exports = router
